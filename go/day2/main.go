@@ -10,11 +10,31 @@ import (
 )
 
 func main() {
-	input := readInput()
-	input[1] = 12
-	input[2] = 2
-	fmt.Println(Intcode(input))
+	partA()
+	partB()
+}
 
+func partA() {
+	fmt.Printf("Part A: %d\n", IntcodeArgs(12, 2))
+}
+
+func partB() {
+	target := 19690720
+
+	for noun := 0; noun < 100; noun++ {
+		for verb := 0; verb < 100; verb++ {
+			if target == IntcodeArgs(noun, verb)[0] {
+				fmt.Printf("Part B: Noun is: %d, verb is %d an answer is %v ", noun, verb, 100*noun+verb)
+			}
+		}
+	}
+}
+
+func IntcodeArgs(noun int, verb int) []int {
+	input := readInput()
+	input[1] = noun
+	input[2] = verb
+	return Intcode(input)
 }
 
 func Intcode(input []int) []int {
