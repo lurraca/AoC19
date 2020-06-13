@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/thoas/go-funk"
 	"strconv"
 	"strings"
 )
@@ -47,17 +48,52 @@ func decreases(input string) bool {
 
 func isAdjacentMatch(input string) bool {
 	var adjacentMatch bool
+	hash := make(map[string]bool)
+
 	splitInput := strings.Split(input, "")
 	for i, char := range splitInput {
-		if adjacentMatch {
-			return true
-		}
+		previousCharacter := ""
+
 		if i == len(splitInput)-1 {
-			return char == splitInput[i-i]
+			previousCharacter = splitInput[i-1]
+			if char == previousCharacter {
+				hash[char] = !(char == splitInput[i-2])
+
+				return !(char == splitInput[i-2]) || containsAdjacent(hash)
+			}
+			return adjacentMatch || containsAdjacent(hash)
 		}
-		if char == splitInput[i+1] {
-			adjacentMatch = true
+
+		nextCharacter := splitInput[i+1]
+		if char != nextCharacter {
+			continue
+		}
+
+		if adjacentMatch && char == nextCharacter && existOn(hash, char) {
+			adjacentMatch = false
+			hash[char] = adjacentMatch
+			continue
+		}
+
+		if char == nextCharacter {
+			exists := existOn(hash, char)
+			adjacentMatch = !exists
+			hash[char] = adjacentMatch && !exists
+			continue
+		}
+
+		if i != 0 && char == previousCharacter {
+			hash[char] = adjacentMatch
+			adjacentMatch = false
 		}
 	}
 	return adjacentMatch
+}
+
+func existOn(hash map[string]bool, char string) bool {
+	return funk.Contains(funk.Keys(hash), char)
+}
+
+func containsAdjacent(hash map[string]bool) bool {
+	return funk.Some(funk.Values(hash), true)
 }
